@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="HymmnosReader/HymmnosReader.csproj" Id="ff214ff2-3e9a-4ac7-a0a1-fa895585bd7f" />
 </Solution>
