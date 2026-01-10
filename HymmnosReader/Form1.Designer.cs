@@ -420,7 +420,7 @@ namespace HymmnosReader
             this.labelVersion.Name = "labelVersion";
             this.labelVersion.Size = new System.Drawing.Size(37, 13);
             this.labelVersion.TabIndex = 3;
-            this.labelVersion.Text = "v1.0.0";
+            this.labelVersion.Text = "v1.0.1";
             // 
             // HymmnosReaderInterface
             // 
