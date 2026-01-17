@@ -40,6 +40,10 @@ namespace HymmnosReader
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBoxWordParameters = new System.Windows.Forms.GroupBox();
+            this.labelSearchResults = new System.Windows.Forms.Label();
+            this.textBoxSearch = new System.Windows.Forms.TextBox();
+            this.labelSearchPrompt1 = new System.Windows.Forms.Label();
+            this.buttonSearch = new System.Windows.Forms.Button();
             this.dataGridViewFiltered = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -160,6 +164,10 @@ namespace HymmnosReader
             // 
             // groupBoxWordParameters
             // 
+            this.groupBoxWordParameters.Controls.Add(this.labelSearchResults);
+            this.groupBoxWordParameters.Controls.Add(this.textBoxSearch);
+            this.groupBoxWordParameters.Controls.Add(this.labelSearchPrompt1);
+            this.groupBoxWordParameters.Controls.Add(this.buttonSearch);
             this.groupBoxWordParameters.Controls.Add(this.dataGridViewFiltered);
             this.groupBoxWordParameters.Controls.Add(this.labelDef);
             this.groupBoxWordParameters.Controls.Add(this.checkBoxPastalie);
@@ -182,6 +190,41 @@ namespace HymmnosReader
             this.groupBoxWordParameters.TabIndex = 2;
             this.groupBoxWordParameters.TabStop = false;
             this.groupBoxWordParameters.Text = "Individual Word Parameters";
+            // 
+            // labelSearchResults
+            // 
+            this.labelSearchResults.AutoSize = true;
+            this.labelSearchResults.Location = new System.Drawing.Point(6, 320);
+            this.labelSearchResults.Name = "labelSearchResults";
+            this.labelSearchResults.Size = new System.Drawing.Size(48, 13);
+            this.labelSearchResults.TabIndex = 14;
+            this.labelSearchResults.Text = "Results: ";
+            // 
+            // textBoxSearch
+            // 
+            this.textBoxSearch.Location = new System.Drawing.Point(6, 294);
+            this.textBoxSearch.Name = "textBoxSearch";
+            this.textBoxSearch.Size = new System.Drawing.Size(100, 20);
+            this.textBoxSearch.TabIndex = 4;
+            // 
+            // labelSearchPrompt1
+            // 
+            this.labelSearchPrompt1.AutoSize = true;
+            this.labelSearchPrompt1.Location = new System.Drawing.Point(6, 275);
+            this.labelSearchPrompt1.Name = "labelSearchPrompt1";
+            this.labelSearchPrompt1.Size = new System.Drawing.Size(153, 13);
+            this.labelSearchPrompt1.TabIndex = 5;
+            this.labelSearchPrompt1.Text = "Search for a Word or Meaning:";
+            // 
+            // buttonSearch
+            // 
+            this.buttonSearch.Location = new System.Drawing.Point(112, 294);
+            this.buttonSearch.Name = "buttonSearch";
+            this.buttonSearch.Size = new System.Drawing.Size(75, 23);
+            this.buttonSearch.TabIndex = 6;
+            this.buttonSearch.Text = "Search";
+            this.buttonSearch.UseVisualStyleBackColor = true;
+            this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
             // 
             // dataGridViewFiltered
             // 
@@ -258,9 +301,9 @@ namespace HymmnosReader
             this.checkBoxPastalie.AutoSize = true;
             this.checkBoxPastalie.Location = new System.Drawing.Point(6, 388);
             this.checkBoxPastalie.Name = "checkBoxPastalie";
-            this.checkBoxPastalie.Size = new System.Drawing.Size(173, 17);
+            this.checkBoxPastalie.Size = new System.Drawing.Size(188, 17);
             this.checkBoxPastalie.TabIndex = 3;
-            this.checkBoxPastalie.Text = "Exclude Pastalie From Search?";
+            this.checkBoxPastalie.Text = "Exclude Pastalie From All Results?";
             this.checkBoxPastalie.UseVisualStyleBackColor = true;
             this.checkBoxPastalie.CheckedChanged += new System.EventHandler(this.checkBoxPastalie_CheckedChanged);
             // 
@@ -420,7 +463,7 @@ namespace HymmnosReader
             this.labelVersion.Name = "labelVersion";
             this.labelVersion.Size = new System.Drawing.Size(37, 13);
             this.labelVersion.TabIndex = 3;
-            this.labelVersion.Text = "v1.0.1";
+            this.labelVersion.Text = "v1.0.2";
             // 
             // HymmnosReaderInterface
             // 
@@ -478,6 +521,10 @@ namespace HymmnosReader
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
         private System.Windows.Forms.Label labelStats;
         private System.Windows.Forms.Label labelVersion;
+        private System.Windows.Forms.Label labelSearchResults;
+        private System.Windows.Forms.TextBox textBoxSearch;
+        private System.Windows.Forms.Label labelSearchPrompt1;
+        private System.Windows.Forms.Button buttonSearch;
     }
 }
 

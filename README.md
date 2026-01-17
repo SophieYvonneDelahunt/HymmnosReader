@@ -22,11 +22,14 @@ Features:
      - Interjections
      - Emotion-Verbs
      - Emotion-Sounds
+ - Allows the user to search for specific words or meanings.
  - Includes a toggle to remove New Testament of Pastalie words from the search results; as Pastalie is a dialect unique to the Infel Phira SH server, it cannot be used with other Hymmnos words.
 
 ##### Version History
 ---
-
+ - v1.0.2
+   - Basic search functionality added
+   - Minor logic improvements
  - v1.0.1
    - Updated README
  - v1.0.0

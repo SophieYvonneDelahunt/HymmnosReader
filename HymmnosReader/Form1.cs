@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /// <summary>
@@ -23,8 +17,6 @@ namespace HymmnosReader
     /// </summary>
     public partial class HymmnosReaderInterface : Form
     {
-        public SqlConnection Connection { get; private set; }
-        string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Hymmnoserver;Integrated Security=True";
         bool noPastalie = false;
 
         int countTotal = 0;
@@ -112,7 +104,8 @@ namespace HymmnosReader
             }
             catch (Exception e)
             {
-                MessageBox.Show("Unable to parse .txt file.\n" + e, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Unable to parse .txt file. Ensure that hymmnos_directory.txt shares a directory with this application.\n\n" + e, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
         }
 
@@ -173,7 +166,7 @@ namespace HymmnosReader
             dataGridViewFiltered.Rows.Clear();
             foreach (Word word in words)
             {
-                if (((word.Dialect == "New Testament of Pastalie")|| (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
+                if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
                 {
                     continue;
                 }
@@ -197,7 +190,7 @@ namespace HymmnosReader
             labelDef.Text = defaultDef;
             dataGridViewFiltered.Rows.Clear();
             foreach (Word word in words)
-                if ((word.Dialect == "New Testament of Pastalie") && (noPastalie == true))
+                if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
                 {
                     continue;
                 } else
@@ -386,6 +379,48 @@ namespace HymmnosReader
                 radioButtonEmotionVerbs_CheckedChanged(sender, e);
             else if (radioButtonEmotionSounds.Checked)
                 radioButtonEmotionSounds_CheckedChanged(sender, e);
+        }
+
+        /// <summary>
+        /// Allows the user to search for Hymmnos words similar to the text typed into the search bar.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Contains event data.</param>
+        private async void buttonSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBoxSearch.Text != "")
+                {
+                    dataGridViewFiltered.Rows.Clear();
+                    string query = textBoxSearch.Text.ToLower();
+                    foreach (Word word in words)
+                    {
+                        if (word.Hymmnos.ToLower().Contains(query) || word.Meaning.ToLower().Contains(query) || word.ClassVar.ToLower().Contains(query) || word.Kana.ToLower().Contains(query) || word.Dialect.ToLower().Contains(query))
+                        {
+                            if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
+                                labelSearchResults.Text = $"Results: {dataGridViewFiltered.Rows.Count}";
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a search term.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred during the search.\n\n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
     }
 }
