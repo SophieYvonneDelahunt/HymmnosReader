@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
 
 /// <summary>
@@ -17,6 +22,7 @@ namespace HymmnosReader
     /// </summary>
     public partial class HymmnosReaderInterface : Form
     {
+        const string DATAFILE = "hymmnos_directory.txt";
         bool noPastalie = false;
 
         int countTotal = 0;
@@ -57,6 +63,7 @@ namespace HymmnosReader
             readData();
             printStats();
             labelDef.Text = defaultDef;
+            checkBoxAI.Enabled = false; // Disable complex search until implemented
         }
 
         /// <summary>
@@ -85,22 +92,26 @@ namespace HymmnosReader
         /// </summary>
         public void readData()
         {
-            const string DATAFILE = "hymmnos_directory.txt";
             try
             {
                 StreamReader reader = new StreamReader(DATAFILE);
-                while (!reader.EndOfStream)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    string[] items = reader.ReadLine().Split('	');
-                    words.Add(new Word(items[0], items[1], items[2], items[3], items[4]));
-                }
-                reader.Close();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
 
-                foreach (Word word in words)
-                {
+                    var items = line.Split('\t');
+                    if (items.Length != 5)
+                        continue;
+
+                    var word = new Word(items[0], items[1], items[2], items[3], items[4]);
+                    words.Add(word);
+
                     dataGridViewInitial.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
                     dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
                 }
+                reader.Close();
             }
             catch (Exception e)
             {
@@ -155,6 +166,22 @@ namespace HymmnosReader
                 }
             }
             labelStats.Text = $"Directory Statistics:\n-------------------------------------------------------------------\nTotal Records: {countTotal}\nCentral Standard Note Records: {countCentral}\nNew Testament of Pastalie Records: {countPastalie}\nMetafalss Note Records: {countMetafalss}\nCluster Note Records: {countCluster}\nCult Ciel Note Records: {countCult}\nAlpha Note (EOLIA) Records: {countAlpha}\nUnofficial Note Records: {countUnofficial}\nAsciydria Note Records: {countAsciydria}\nOther Records: {countOther}";
+
+            var lexiconStats = new StringBuilder();
+            lexiconStats.AppendLine("Directory Statistics:");
+            lexiconStats.AppendLine("-------------------------------------------------------------------");
+            lexiconStats.AppendLine($"Total Records: {countTotal}");
+            lexiconStats.AppendLine($"Central Standard Note Records: {countCentral}");
+            lexiconStats.AppendLine($"New Testament of Pastalie Records: {countPastalie}");
+            lexiconStats.AppendLine($"Metafalss Note Records: {countMetafalss}");
+            lexiconStats.AppendLine($"Cluster Note Records: {countCluster}");
+            lexiconStats.AppendLine($"Cult Ciel Note Records: {countCult}");
+            lexiconStats.AppendLine($"Alpha Note (EOLIA) Records: {countAlpha}");
+            lexiconStats.AppendLine($"Unofficial Note Records: {countUnofficial}");
+            lexiconStats.AppendLine($"Asciydria Note Records: {countAsciydria}");
+            lexiconStats.AppendLine($"Other Records: {countOther}");
+
+            labelStats.Text = lexiconStats.ToString();
         }
 
         /// <summary>.
@@ -193,7 +220,8 @@ namespace HymmnosReader
                 if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
                 {
                     continue;
-                } else
+                }
+                else
                 {
                     dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
                 }
@@ -382,11 +410,11 @@ namespace HymmnosReader
         }
 
         /// <summary>
-        /// Allows the user to search for Hymmnos words similar to the text typed into the search bar.
+        /// Allows the user to search for Hymmnos words. A checkbox element determines which sort type is used.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">Contains event data.</param>
-        private async void buttonSearch_Click(object sender, EventArgs e)
+        private void buttonSearch_Click(object sender, EventArgs e)
         {
             try
             {
@@ -394,33 +422,63 @@ namespace HymmnosReader
                 {
                     dataGridViewFiltered.Rows.Clear();
                     string query = textBoxSearch.Text.ToLower();
-                    foreach (Word word in words)
+                    if (checkBoxAI.Checked)
                     {
-                        if (word.Hymmnos.ToLower().Contains(query) || word.Meaning.ToLower().Contains(query) || word.ClassVar.ToLower().Contains(query) || word.Kana.ToLower().Contains(query) || word.Dialect.ToLower().Contains(query))
-                        {
-                            if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
-                                labelSearchResults.Text = $"Results: {dataGridViewFiltered.Rows.Count}";
-                            }
-                        }
+                        searchComplex(query);
+                    }
+                    else
+                    {
+                        searchSimple(query);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Please enter a search term.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    labelSearchResults.Text = "Results:";
+                    MessageBox.Show("Please enter a search term.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
             }
             catch (Exception ex)
             {
+                labelSearchResults.Text = "Results:";
                 MessageBox.Show("An error occurred during the search.\n\n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+        }
+
+        /// <summary>
+        /// Simple search function that matches words whose fields contain substrings.
+        /// </summary>
+        /// <param name="query">The search query provided by the user.</param>
+        private void searchSimple(string query)
+        {
+            foreach (Word word in words)
+            {
+                if (word.Hymmnos.ToLower().Contains(query) || word.Meaning.ToLower().Contains(query) || word.ClassVar.ToLower().Contains(query) || word.Kana.ToLower().Contains(query) || word.Dialect.ToLower().Contains(query))
+                {
+                    if (((word.Dialect == "New Testament of Pastalie") || (word.Dialect == "Pastalie [Unofficial]")) && (noPastalie == true))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
+                    }
+                }
+            }
+            labelSearchResults.Text = $"Results: {dataGridViewFiltered.Rows.Count}";
+        }
+
+        /// <summary>
+        /// More complex search function that makes an API call to ChatGPT along with a .txt file containing the entire Hymmnos lexicon.
+        /// The .txt file is called hymmnos_directory.txt and must be in the same directory as the application executable.
+        /// The API key is stored in an environment variable named OPENAI_API_KEY.
+        /// The assistant is asked to return only a comma-separated list of the Hymmnos words (first column) that best match the query.
+        /// </summary>
+        /// <param name="query">The search query provided by the user.</param>
+        private void searchComplex(string query)
+        {
+
         }
     }
 }

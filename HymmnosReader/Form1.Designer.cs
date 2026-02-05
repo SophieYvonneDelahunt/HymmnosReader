@@ -30,6 +30,7 @@ namespace HymmnosReader
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HymmnosReaderInterface));
             this.labelDatabaseStatus = new System.Windows.Forms.Label();
             this.groupBoxInitialHymmnos = new System.Windows.Forms.GroupBox();
             this.labelStats = new System.Windows.Forms.Label();
@@ -66,6 +67,7 @@ namespace HymmnosReader
             this.radioButtonVerbs = new System.Windows.Forms.RadioButton();
             this.radioButtonNouns = new System.Windows.Forms.RadioButton();
             this.labelVersion = new System.Windows.Forms.Label();
+            this.checkBoxAI = new System.Windows.Forms.CheckBox();
             this.groupBoxInitialHymmnos.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInitial)).BeginInit();
             this.groupBoxWordParameters.SuspendLayout();
@@ -164,6 +166,7 @@ namespace HymmnosReader
             // 
             // groupBoxWordParameters
             // 
+            this.groupBoxWordParameters.Controls.Add(this.checkBoxAI);
             this.groupBoxWordParameters.Controls.Add(this.labelSearchResults);
             this.groupBoxWordParameters.Controls.Add(this.textBoxSearch);
             this.groupBoxWordParameters.Controls.Add(this.labelSearchPrompt1);
@@ -463,7 +466,17 @@ namespace HymmnosReader
             this.labelVersion.Name = "labelVersion";
             this.labelVersion.Size = new System.Drawing.Size(37, 13);
             this.labelVersion.TabIndex = 3;
-            this.labelVersion.Text = "v1.0.2";
+            this.labelVersion.Text = "v1.0.3";
+            // 
+            // checkBoxAI
+            // 
+            this.checkBoxAI.AutoSize = true;
+            this.checkBoxAI.Location = new System.Drawing.Point(193, 297);
+            this.checkBoxAI.Name = "checkBoxAI";
+            this.checkBoxAI.Size = new System.Drawing.Size(126, 17);
+            this.checkBoxAI.TabIndex = 4;
+            this.checkBoxAI.Text = "Use AI Functionality?";
+            this.checkBoxAI.UseVisualStyleBackColor = true;
             // 
             // HymmnosReaderInterface
             // 
@@ -474,6 +487,7 @@ namespace HymmnosReader
             this.Controls.Add(this.groupBoxWordParameters);
             this.Controls.Add(this.groupBoxInitialHymmnos);
             this.Controls.Add(this.labelDatabaseStatus);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HymmnosReaderInterface";
             this.Text = "Hymmnos Reader";
             this.groupBoxInitialHymmnos.ResumeLayout(false);
@@ -525,6 +539,7 @@ namespace HymmnosReader
         private System.Windows.Forms.TextBox textBoxSearch;
         private System.Windows.Forms.Label labelSearchPrompt1;
         private System.Windows.Forms.Button buttonSearch;
+        private System.Windows.Forms.CheckBox checkBoxAI;
     }
 }
 

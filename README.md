@@ -6,7 +6,7 @@
 A simple program written in C# designed to manage and sort the entire Hymmnos lexicon from the Ar Tonelico series.
 
 Features:
- - Includes a UTF-16-encored .txt file that contains the entire Hymmnos lexicon
+ - Includes a UTF-16-encoded .txt file that contains the entire Hymmnos lexicon
  - Displays characteristics of the Hymmnos language, such as the number of records in each Hymmnos dialect
  - Sorts the lexicon alphabetically based on the word, meaning, class, kana, or dialect
  - Allows the user to search for specific word parameters such as:
@@ -27,10 +27,14 @@ Features:
 
 ##### Version History
 ---
+ - v1.0.3
+   - Added an application icon.
+   - Initial structure of AI-powered search (not yet implemented).
+   - Refactoring and code optimisation.
  - v1.0.2
-   - Basic search functionality added
-   - Minor logic improvements
+   - Basic search functionality added.
+   - Minor logic improvements.
  - v1.0.1
-   - Updated README
+   - Updated README.
  - v1.0.0
-   - Initial release
+   - Initial release.
