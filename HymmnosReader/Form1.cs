@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
+using OpenAI;
 
 /// <summary>
 /// >Sophie Delahunt
@@ -63,7 +64,7 @@ namespace HymmnosReader
             readData();
             printStats();
             labelDef.Text = defaultDef;
-            checkBoxAI.Enabled = false; // Disable complex search until implemented
+            // checkBoxAI.Enabled = false; // Disable complex search until implemented
         }
 
         /// <summary>
@@ -478,7 +479,32 @@ namespace HymmnosReader
         /// <param name="query">The search query provided by the user.</param>
         private void searchComplex(string query)
         {
+            const Client = new OpenAI();
+            const file = await client.files.create({
+            file: fs.createReadStream("hymmnos_directory.txt"),
+                purpose: "user_data",
+            });
 
+            const response = await client.responses.create({
+            model: "gpt-5",
+            input: [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "input_file",
+                                file_id: file.id,
+                            },
+                            {
+                                type: "input_text",
+                                text: $"Here's a file. Look through the file's contents and please give me the Hymmnos words with meanings that's most similar to the following word; \"{query}\". Respond only with Hymmnos words from that file, separated by commas.z",
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            console.log(response.output_text);
         }
     }
 }
