@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using DotNetEnv;
 
 /// <summary>
 /// >Sophie Delahunt
@@ -20,6 +21,7 @@ namespace HymmnosReader
         [STAThread]
         static void Main()
         {
+            Env.Load();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new HymmnosReaderInterface());

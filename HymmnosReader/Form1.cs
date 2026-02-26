@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Text;
-using System.Text.Json;
 using System.Windows.Forms;
+using OpenAI;
 using OpenAI.Files;
 using OpenAI.Responses;
+using DotNetEnv;
 
 /// <summary>
 /// >Sophie Delahunt
@@ -26,6 +25,7 @@ namespace HymmnosReader
     {
         const string DATAFILE = "hymmnos_directory.txt";
         bool noPastalie = false;
+        String apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
         int countTotal = 0;
         int countCentral = 0;
@@ -480,10 +480,9 @@ namespace HymmnosReader
         /// <param name="query">The search query provided by the user.</param>
         private void searchComplex(string query)
         {
-            string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
-            OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
+            OpenAIResponseClient client = new(model: "gpt-5", apiKey: apiKey);
 
-            OpenAIFileClient files = new(key);
+            OpenAIFileClient files = new(apiKey);
             OpenAIFile file = files.UploadFile("hymmnos_reader.txt", FileUploadPurpose.UserData);
 
             OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
