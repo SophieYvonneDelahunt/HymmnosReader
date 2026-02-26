@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Threading.Tasks;
 using System.Text;
+using System.Net.Http;
+using System.Text.Json;
 using System.Windows.Forms;
-using OpenAI;
-using OpenAI.Files;
-using OpenAI.Responses;
-using DotNetEnv;
 
 /// <summary>
 /// >Sophie Delahunt
 /// December 6, 2025
 /// Personal Project - Hymmnos Reader
 /// </summary>
-
 namespace HymmnosReader
 {
     /// <summary>
@@ -25,7 +21,6 @@ namespace HymmnosReader
     {
         const string DATAFILE = "hymmnos_directory.txt";
         bool noPastalie = false;
-        String apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
         int countTotal = 0;
         int countCentral = 0;
@@ -65,7 +60,7 @@ namespace HymmnosReader
             readData();
             printStats();
             labelDef.Text = defaultDef;
-            // checkBoxAI.Enabled = false; // Disable complex search until implemented
+            checkBoxAI.Enabled = false; // Disable complex search until implemented
         }
 
         /// <summary>
@@ -201,7 +196,7 @@ namespace HymmnosReader
                 }
                 else
                 {
-                    if (word.ClassVar.Contains($",{wordType}") || word.ClassVar.Contains($", {wordType}") || word.ClassVar.Contains($"{wordType},") || word.ClassVar == $"{wordType}")
+                    if (word.ClassVar.Contains($", {wordType}") || word.ClassVar.Contains($", {wordType}") || word.ClassVar.Contains($"{wordType},") || word.ClassVar == $"{wordType}")
                     {
                         dataGridViewFiltered.Rows.Add(word.Hymmnos, word.Meaning, word.ClassVar, word.Kana, word.Dialect);
                     }
@@ -472,27 +467,29 @@ namespace HymmnosReader
         }
 
         /// <summary>
-        /// More complex search function that makes an API call to ChatGPT along with a .txt file containing the entire Hymmnos lexicon.
-        /// The .txt file is called hymmnos_directory.txt and must be in the same directory as the application executable.
-        /// The API key is stored in an environment variable named OPENAI_API_KEY.
-        /// The assistant is asked to return only a comma-separated list of the Hymmnos words (first column) that best match the query.
+        /// More complex search function that makes an API call to OpenAI's ChatGPT.
         /// </summary>
         /// <param name="query">The search query provided by the user.</param>
         private void searchComplex(string query)
         {
-            OpenAIResponseClient client = new(model: "gpt-5", apiKey: apiKey);
+            String apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            string fileContents = File.ReadAllText(DATAFILE);
+            if (fileContents.Length > 15000)
+            {
+                fileContents = fileContents.Substring(0, 15000) + "\n... (truncated)";
+            }
+            string systemPrompt = "You are a parsing assistant. Given a small file of tab-separated Hymmnos records and a query word, return only a comma-separated list of Hymmnos words from the file that have meanings that are most similar to the query. Do not include any extra commentary or formatting.";
+            string userPrompt = $"Here is a file containing Hymmnos records (tab-separated columns: Hymmnos, Meaning, Class, Kana, Dialect):\n\n{fileContents}\n\nFind the Hymmnos words with meanings that are most similar to the query: \"{query}\". Respond only with Hymmnos words from that file, separated by commas. If there are no matches, return an empty string.";
 
-            OpenAIFileClient files = new(apiKey);
-            OpenAIFile file = files.UploadFile("hymmnos_reader.txt", FileUploadPurpose.UserData);
-
-            OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
-                ResponseItem.CreateUserMessageItem([
-                    ResponseContentPart.CreateInputFilePart(file.Id),
-                    ResponseContentPart.CreateInputTextPart($"Here's a file. Look through the file's contents and please give me the Hymmnos words with meanings that's most similar to the following word; \"{query}\". Respond only with Hymmnos words from that file, separated by commas.z"),
-                ]),
-            ]);
-
-            Console.WriteLine(response.GetOutputText());
+            try
+            {
+                // Not yet functional - requires implementation of OpenAI API call and response parsing
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred during the search.\n\n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
     }
 }
