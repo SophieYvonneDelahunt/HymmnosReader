@@ -8,7 +8,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
-using OpenAI;
+using OpenAI.Files;
+using OpenAI.Responses;
 
 /// <summary>
 /// >Sophie Delahunt
@@ -479,32 +480,20 @@ namespace HymmnosReader
         /// <param name="query">The search query provided by the user.</param>
         private void searchComplex(string query)
         {
-            const Client = new OpenAI();
-            const file = await client.files.create({
-            file: fs.createReadStream("hymmnos_directory.txt"),
-                purpose: "user_data",
-            });
+            string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
+            OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
 
-            const response = await client.responses.create({
-            model: "gpt-5",
-            input: [
-                    {
-                        role: "user",
-                        content: [
-                            {
-                                type: "input_file",
-                                file_id: file.id,
-                            },
-                            {
-                                type: "input_text",
-                                text: $"Here's a file. Look through the file's contents and please give me the Hymmnos words with meanings that's most similar to the following word; \"{query}\". Respond only with Hymmnos words from that file, separated by commas.z",
-                            },
-                        ],
-                    },
-                ],
-            });
+            OpenAIFileClient files = new(key);
+            OpenAIFile file = files.UploadFile("hymmnos_reader.txt", FileUploadPurpose.UserData);
 
-            console.log(response.output_text);
+            OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
+                ResponseItem.CreateUserMessageItem([
+                    ResponseContentPart.CreateInputFilePart(file.Id),
+                    ResponseContentPart.CreateInputTextPart($"Here's a file. Look through the file's contents and please give me the Hymmnos words with meanings that's most similar to the following word; \"{query}\". Respond only with Hymmnos words from that file, separated by commas.z"),
+                ]),
+            ]);
+
+            Console.WriteLine(response.GetOutputText());
         }
     }
 }
