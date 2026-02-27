@@ -295,7 +295,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="hymmnosreader_icon.ico" />
-    <Content Include="hymmnos_directory.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
